@@ -153,6 +153,25 @@ class ProductController
         }
     }
 
+public function detail()
+{
+    $id = $_GET['id'] ?? 0;
+
+    $product = $this->productModel->find($id);
+
+    if (!$product) {
+        echo "Sản phẩm không tồn tại";
+        return;
+    }
+
+    $sizes = $this->sizeModel->getAll();
+    $colors = $this->colorModel->getAll();
+
+    $allProducts = $this->productModel->getAll();
+
+    require_once 'views/client/ctPro.php';
+}
+
     // ===== XOÁ =====
     public function delete()
     {
@@ -172,4 +191,66 @@ class ProductController
         header("Location:?url=listProduct");
         exit();
     }
+    public function shop() {
+    $productModel = new ProductModel();
+
+    // Lấy tất cả sản phẩm
+    $products = $productModel->getAll();
+    include 'views/client/shop.php';
+}
+
+public function cart() {
+    include 'views/client/cart.php';
+}
+
+public function sale() {
+    include 'views/client/shop.php'; // lọc sale sau
+}
+
+public function new() {
+    include 'views/client/shop.php'; // lọc new sau
+}
+public function giayBongRo()
+{
+    $category_id = 6; // id giày bóng rổ
+
+    // gọi model lấy sản phẩm theo category
+    $products = $this->productModel->getProductByCategory($category_id);
+
+    // truyền dữ liệu sang view
+    include 'views/client/giaybr.php';
+}
+public function giayChayBo()
+{
+    $category_id = 7; // Giày chạy
+
+    // lấy sản phẩm theo danh mục
+    $products = $this->productModel->getProductByCategory($category_id);
+
+    include 'views/client/giaychaybo.php';
+}
+public function giayBongChuyen()
+{
+    $category_id = 9; // Giày bóng chuyền
+
+    // lấy sản phẩm theo danh mục
+    $products = $this->productModel->getProductByCategory($category_id);
+
+    include 'views/client/giaybongchuyen.php';
+}
+public function giayBongDa()
+{
+    $category_id = 8; // Giày bóng đá
+    $products = $this->productModel->getProductByCategory($category_id);
+
+    include 'views/client/giaybongda.php';
+}
+public function giayCauLong()
+{
+    $category_id = 10; // Giày cầu lông
+    $products = $this->productModel->getProductByCategory($category_id);
+
+    include 'views/client/giaycaulong.php';
+}
+
 }

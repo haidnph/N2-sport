@@ -69,7 +69,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 <div class="flex items-center gap-6">
 
-  <form class="relative">
+   <form class="relative">
     <input
         type="text"
         placeholder="Tìm kiếm sản phẩm..."
@@ -115,7 +115,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </header>
     <main class="lg:max-w-7xl mx-auto">
   <div class="lg:text-[15px] text-gray-500 lg:mt-5">
-    Home > <span class="text-black">Casual</span>
+    Home > <span class="text-black">Giày cầu lông</span>
   </div>
 
   <div class="flex gap-10">
@@ -198,7 +198,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <section class="mt-10 w-[75%]">
 
   <div class="flex justify-between pl-5">
-    <h2 class="font-bold text-2xl">Casual</h2>
+    <h2 class="font-bold text-2xl">Giày cầu lông chính hãng</h2>
     <p class="text-gray-500">
       Showing <?= count($products ?? []) ?> Products
     </p>

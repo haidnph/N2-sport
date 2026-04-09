@@ -107,6 +107,53 @@ class ProductModel extends BaseModel
 
         return $stmt->execute();
     }
+public function getAllLimit($limit = 8) {
+    $sql = "SELECT p.*, c.category_name, b.brand_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN brands b ON p.brand_id = b.brand_id
+            ORDER BY p.product_id DESC
+            LIMIT $limit";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function getHotProducts($limit = 8)
+{
+    $sql = "SELECT * FROM products ORDER BY quantity DESC LIMIT $limit";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+// ===== SẢN PHẨM LIÊN QUAN =====
+public function getRelated($category_id, $current_id, $limit = 6)
+{
+    $sql = "SELECT p.*, 
+                   c.category_name, 
+                   b.brand_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN brands b ON p.brand_id = b.brand_id
+            WHERE p.category_id = :cate_id
+            AND p.product_id != :current_id
+            ORDER BY p.product_id DESC
+            LIMIT $limit";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->bindParam(':cate_id', $category_id);
+    $stmt->bindParam(':current_id', $current_id);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function getProductByCategory($category_id)
+{
+    $sql = "SELECT * FROM products WHERE category_id = ?";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([$category_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     // ===== XOÁ =====
     public function deleteProduct($id)

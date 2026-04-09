@@ -5,21 +5,87 @@ require_once 'controllers/CategoryController.php';
 require_once 'controllers/BrandController.php';
 require_once 'controllers/ProductController.php';
 require_once 'controllers/SizeController.php'; 
-require_once 'controllers/colorController.php';// ✅ thêm
+require_once 'controllers/ColorController.php';
+require_once 'controllers/AdminController.php';
 
-$url = $_GET['url'] ?? '/';
+$url = $_GET['url'] ?? 'home';
 
 $auth = new AuthController();
 $home = new HomeController();
 $category = new CategoryController();
 $brand = new BrandController();
 $product = new ProductController();
-$size = new SizeController(); // ✅ thêm
-$color= new colorController();
+$size = new SizeController();
+$color = new ColorController();
+$admin = new AdminController();
 
 switch ($url) {
 
-    // ===== AUTH =====
+    // =========================
+    // ===== CLIENT SIDE =======
+    // =========================
+
+    // HOME
+    case 'home':
+        $home->index();
+        break;
+
+    // SHOP (MENU)
+    case 'shop':
+        $product->shop(); // bạn cần tạo hàm này
+        break;
+
+    // PRODUCT DETAIL
+    case 'productDetail':
+        $product->detail();
+        break;
+
+    // CART
+    case 'cart':
+        $product->cart(); // hoặc CartController nếu có
+        break;
+
+    // SALE
+    case 'sale':
+        $product->sale(); // lọc sản phẩm giảm giá
+        break;
+
+    // NEW ARRIVALS
+    case 'new':
+        $product->new(); // sản phẩm mới
+        break;
+
+    // BRANDS
+    case 'brands':
+        $brand->clientList(); // cần tạo hàm hiển thị brand phía client
+        break;
+        // GIAY BONG RO
+        case 'giay-bong-ro':
+        $product->giayBongRo();
+        break;
+
+        case 'giayChay':
+        $product->giayChayBo();
+        break;
+
+        case 'giayBongChuyen':
+        $product->giayBongChuyen();
+        break;
+
+        case 'giayBongDa':
+        $product->giayBongDa();
+        break;
+
+        case 'giayCauLong':
+        $product->giayCauLong();
+        break;
+
+
+
+    // =========================
+    // ===== AUTH =============
+    // =========================
+
     case 'login':
         $auth->login();
         break;
@@ -32,17 +98,16 @@ switch ($url) {
         $auth->logout();
         break;
 
-    // ===== ADMIN =====
+
+    // =========================
+    // ===== ADMIN SIDE ========
+    // =========================
+
     case 'admin':
-        require 'views/admin/main.php';
+        $admin->index();
         break;
 
-    // ===== CART =====
-    case 'cart':
-        require 'views/client/cart.php';
-        break;
-
-    // ===== CATEGORY =====
+    // CATEGORY
     case 'listCate':
         $category->list();
         break;
@@ -67,7 +132,7 @@ switch ($url) {
         $category->delete();
         break;
 
-    // ===== BRAND =====
+    // BRAND
     case 'listBrand':
         $brand->list();
         break;
@@ -92,7 +157,7 @@ switch ($url) {
         $brand->delete();
         break;
 
-    // ===== PRODUCT =====
+    // PRODUCT
     case 'listProduct':
         $product->list();
         break;
@@ -117,7 +182,7 @@ switch ($url) {
         $product->delete();
         break;
 
-    // ===== SIZE =====
+    // SIZE
     case 'listSize':
         $size->list();
         break;
@@ -141,32 +206,33 @@ switch ($url) {
     case 'deleteSize':
         $size->delete();
         break;
-        // ===== COLOR =====
-case 'listColor':
-    $color->list();
-    break;
 
-case 'addColor':
-    $color->add();
-    break;
+    // COLOR
+    case 'listColor':
+        $color->list();
+        break;
 
-case 'addColorProcess':
-    $color->addProcess();
-    break;
+    case 'addColor':
+        $color->add();
+        break;
 
-case 'editColor':
-    $color->edit();
-    break;
+    case 'addColorProcess':
+        $color->addProcess();
+        break;
 
-case 'editColorProcess':
-    $color->editProcess();
-    break;
+    case 'editColor':
+        $color->edit();
+        break;
 
-case 'deleteColor':
-    $color->delete();
-    break;
+    case 'editColorProcess':
+        $color->editProcess();
+        break;
 
-    // ===== HOME =====
+    case 'deleteColor':
+        $color->delete();
+        break;
+
+    // DEFAULT
     default:
         $home->index();
         break;
