@@ -107,6 +107,61 @@ class ProductModel extends BaseModel
 
         return $stmt->execute();
     }
+    public function getAllLimit($limit = 8)
+    {
+        $sql = "SELECT p.*, c.category_name, b.brand_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN brands b ON p.brand_id = b.brand_id
+            ORDER BY p.product_id DESC
+            LIMIT $limit";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getHotProducts($limit = 8)
+    {
+        $sql = "SELECT * FROM products ORDER BY quantity DESC LIMIT $limit";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // ===== SẢN PHẨM LIÊN QUAN =====
+    public function getRelated($category_id, $current_id, $limit = 6)
+    {
+        $sql = "SELECT p.*, 
+                   c.category_name, 
+                   b.brand_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN brands b ON p.brand_id = b.brand_id
+            WHERE p.category_id = :cate_id
+            AND p.product_id != :current_id
+            ORDER BY p.product_id DESC
+            LIMIT $limit";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':cate_id', $category_id);
+        $stmt->bindParam(':current_id', $current_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getProductByCategory($category_id)
+    {
+        $sql = "SELECT * FROM products WHERE category_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$category_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getProductById($id)
+    {
+        $sql = "SELECT * FROM products WHERE product_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     // ===== XOÁ =====
     public function deleteProduct($id)
@@ -116,4 +171,72 @@ class ProductModel extends BaseModel
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
+public function search($keyword)
+{
+    $keyword = trim($keyword);
+
+    if ($keyword === '') {
+        return []; // 🔥 tránh search rỗng
+    }
+
+    $sql = "
+        SELECT p.*, 
+               c.category_name, 
+               b.brand_name
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN brands b ON p.brand_id = b.brand_id
+        WHERE 
+            p.product_name LIKE :keyword
+            OR c.category_name LIKE :keyword
+            OR b.brand_name LIKE :keyword
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    $stmt->execute([
+        ':keyword' => '%' . $keyword . '%'
+    ]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function filterAll($category_id = null, $brands = [], $sizes = [])
+{
+    $sql = "
+        SELECT p.*, 
+               c.category_name, 
+               b.brand_name,
+               s.size_value
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN brands b ON p.brand_id = b.brand_id
+        LEFT JOIN sizes s ON p.size_id = s.size_id
+        WHERE 1=1
+    ";
+
+    $params = [];
+
+    // lọc category
+    if ($category_id) {
+        $sql .= " AND p.category_id = :category_id";
+        $params[':category_id'] = $category_id;
+    }
+
+    // lọc brand
+    if (!empty($brands)) {
+        $sql .= " AND p.brand_id IN (" . implode(',', array_map('intval', $brands)) . ")";
+    }
+
+    // lọc size
+    if (!empty($sizes)) {
+        $sql .= " AND p.size_id IN (" . implode(',', array_map('intval', $sizes)) . ")";
+    }
+
+    $sql .= " ORDER BY p.product_id DESC";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

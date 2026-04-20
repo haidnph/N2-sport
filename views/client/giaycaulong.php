@@ -69,7 +69,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 <div class="flex items-center gap-6">
 
-<form class="relative" method="GET" action="index.php">
+ <form class="relative" method="GET" action="index.php">
     <input type="hidden" name="url" value="search">
 
     <input
@@ -122,16 +122,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </header>
     <main class="lg:max-w-7xl mx-auto">
   <div class="lg:text-[15px] text-gray-500 lg:mt-5">
-    Home > <span class="text-black">Casual</span>
+    Home > <span class="text-black">Giày cầu lông</span>
   </div>
 
   <div class="flex gap-10">
     
     <!-- FILTER -->
-<section class="border border-gray-500 w-[25%] rounded-3xl mt-10">
+  <section class="border border-gray-500 w-[25%] rounded-3xl mt-10">
   <form method="GET" action="index.php" class="w-[250px] mx-auto">
 
-    <input type="hidden" name="url" value="shop">
+    <input type="hidden" name="url" value="giayCauLong">
 
     <!-- HEADER -->
     <div class="flex items-center justify-between border-b border-gray-500 pt-5 pb-5">
@@ -210,7 +210,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <section class="mt-10 w-[75%]">
 
   <div class="flex justify-between pl-5">
-    <h2 class="font-bold text-2xl">All products</h2>
+    <h2 class="font-bold text-2xl">Giày cầu lông chính hãng</h2>
     <p class="text-gray-500">
       Showing <?= count($products ?? []) ?> Products
     </p>

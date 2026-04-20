@@ -66,6 +66,9 @@ class BrandController
         $view = 'admin/brand/editBrand.php';
         require_once PATH_VIEW . 'admin/main.php';
     }
+    public function clientList() {
+    include 'views/client/brands.php';
+}
 
     // ===== XỬ LÝ SỬA =====
     public function editProcess()

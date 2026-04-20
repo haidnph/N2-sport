@@ -42,15 +42,15 @@
     </select>
 
     <!-- SIZE -->
-    <select name="size_id"
-            class="w-1/3 border p-2 rounded focus:outline-none focus:ring-1 focus:ring-black">
-        <?php foreach($listSize as $s): ?>
-            <option value="<?= $s['size_id'] ?>"
-                <?= $s['size_id'] == $product['size_id'] ? 'selected' : '' ?>>
-                <?= $s['size_values'] ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+  <select name="size_id"
+        class="w-1/3 border p-2 rounded focus:outline-none focus:ring-1 focus:ring-black">
+    <?php foreach($listSize as $s): ?>
+        <option value="<?= $s['size_id'] ?>"
+            <?= $s['size_id'] == $product['size_id'] ? 'selected' : '' ?>>
+            <?= $s['size_value'] ?>
+        </option>
+    <?php endforeach; ?>
+</select>
 
     <!-- QUANTITY -->
     <input type="number" name="quantity"
