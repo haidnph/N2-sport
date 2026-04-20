@@ -3,324 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
+    <title>Cửa hàng - N2 Sport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        /* Hiệu ứng nảy trang khi mới load */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-item { animation: fadeInUp 0.5s ease-out forwards; }
+        
+        /* Tạo độ trễ để sản phẩm hiện lần lượt */
+        <?php for($i = 1; $i <= 12; $i++): ?>
+        .delay-<?= $i ?> { animation-delay: <?= $i * 0.08 ?>s; opacity: 0; }
+        <?php endfor; ?>
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-<!-- Font Awesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+        /* Custom style cho Modal */
+        .modal-active { display: flex !important; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
 
 <body class="bg-white">
-    <!-- HEADER -->
-<header class="shadow-sm">
 
-<!-- TOP BAR -->
+<header class="shadow-sm sticky top-0 bg-white z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-5">
+        <div class="flex items-center gap-10">
+            <div class="flex items-center flex-shrink-0 gap-2 group">
+                <a href="index.php" class="flex items-baseline italic tracking-tighter transition-opacity duration-300 hover:opacity-80">
+                    <span class="text-3xl font-black text-slate-900">N<span class="text-black">2</span></span>
+                    <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
+                </a>
+            </div>
+            <ul class="flex gap-6 flex-nowrap overflow-x-auto scrollbar-hide whitespace-nowrap">
+                <li><a href="index.php?url=shop" class="block px-3 py-2 rounded-md hover:bg-gray-100 transition">Shop</a></li>
+                <?php if (!empty($listCate)): ?>
+                    <?php foreach(array_slice($listCate, 0, 5) as $cate): ?>
+                        <li><a href="index.php?url=shop&category_id=<?= $cate['category_id'] ?>" class="block px-3 py-2 rounded-md hover:bg-gray-100 transition"><?= htmlspecialchars($cate['category_name']) ?></a></li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <div class="flex items-center gap-6">
+            <form class="relative">
+                <input type="text" placeholder="Tìm kiếm sản phẩm..." class="w-48 md:w-64 lg:w-72 p-2.5 pl-10 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200" />
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            </form>
+            <div class="flex gap-4 text-xl items-center">
+                <a href="index.php?url=cart" class="hover:text-blue-500 transition"><i class="fa-solid fa-cart-shopping cursor-pointer"></i></a>
+                <?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
+                <?php if (isset($_SESSION['user'])): ?>
+                    <div class="flex items-center gap-3 border-l pl-4">
+                        <div class="flex flex-col text-right">
+                            <span class="text-xs text-gray-400">Chào,</span>
+                            <span class="font-bold text-sm text-gray-800"><?= htmlspecialchars($_SESSION['user']['name'] ?? 'User') ?></span>
+                        </div>
+                        <a href="index.php?url=logout" class="text-red-500 hover:text-red-700 transition"><i class="fa-solid fa-right-from-bracket text-lg"></i></a>
+                    </div>
+                <?php else: ?>
+                    <a href="index.php?url=login" class="hover:text-blue-500 transition"><i class="fa-solid fa-user cursor-pointer"></i></a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</header>
 
-
-
-<div class="max-w-7xl mx-auto flex justify-between items-center p-5">
-
-<div class="flex items-center gap-10">
-
-    <div class="flex items-center flex-shrink-0 gap-2 group">
-        <a href="index.php" class="flex items-baseline italic tracking-tighter transition-opacity duration-300 hover:opacity-80">
-            <span class="text-3xl font-black text-slate-900">N<span class="text-black">2</span></span>
-            <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
-        </a>
+<main class="max-w-7xl mx-auto py-16 px-5 min-h-screen">
+    <div class="mb-12 border-b pb-8 flex justify-between items-end animate-item">
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 italic">Home / Shop</p>
+            <h1 class="text-5xl font-black uppercase italic tracking-tighter">SẢN PHẨM <span class="text-blue-600">N2 SPORT</span></h1>
+        </div>
+        <p class="text-gray-400 italic font-medium text-sm">Hiển thị <?= count($listProduct ?? []) ?> sản phẩm</p>
     </div>
 
-    <!-- MENU -->
-   <ul class="flex gap-6 flex-nowrap overflow-x-auto scrollbar-hide whitespace-nowrap">
-    <li class="relative group">
-        <a href="index.php?url=shop" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Shop
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayCauLong" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày cầu lông
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayBongDa" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng đá
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giay-bong-ro" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng rổ
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayChay" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày chạy bộ
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayBongChuyen" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng chuyền
-        </a>
-    </li>
-</ul>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <?php if (!empty($listProduct)): ?>
+            <?php foreach($listProduct as $index => $item): ?>
+                <div class="flex flex-col bg-white p-4 rounded-[2.5rem] border hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 relative group animate-item delay-<?= ($index % 12) + 1 ?>">
+                    <span class="absolute top-6 left-6 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full z-10 shadow-sm uppercase italic">Available</span>
+                    <div class="overflow-hidden rounded-[2rem] bg-gray-50 mb-4 aspect-square relative">
+                        <img src="uploads/<?= htmlspecialchars($item['image']) ?>" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-2">
+                        <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center p-4">
+                             <a href="?url=productDetail&id=<?= $item['product_id'] ?>" class="w-full bg-white text-black text-[10px] font-black py-3 rounded-2xl text-center hover:bg-black hover:text-white transition-all transform translate-y-10 group-hover:translate-y-0 duration-500 uppercase tracking-widest">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    <p class="font-bold text-gray-800 text-center line-clamp-1 mb-1 px-2 uppercase tracking-tight transition-colors group-hover:text-blue-600"><?= htmlspecialchars($item['product_name']) ?></p>
+                    <p class="text-blue-600 font-black text-center mb-4 text-xl italic tracking-tighter"><?= number_format($item['base_price']) ?> <span class="text-sm font-medium italic">đ</span></p>
+                    
+                    <div class="px-2 mt-auto">
+                        <button type="button" 
+                                onclick="openQuickSelect('<?= $item['product_id'] ?>', '<?= htmlspecialchars($item['product_name']) ?>', '<?= $item['base_price'] ?>', '<?= $item['image'] ?>')"
+                                class="w-full border-2 border-black text-black text-[10px] font-black py-3 rounded-2xl hover:bg-black hover:text-white transition-all duration-300 uppercase tracking-widest active:scale-95 shadow-md">
+                            <i class="fa-solid fa-cart-plus mr-2"></i> Mua ngay
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-span-full py-40 text-center bg-gray-50 rounded-[50px] border-4 border-dashed border-gray-100 animate-item">
+                <h2 class="text-3xl font-black text-gray-300 uppercase italic">Hết giày rồi b ơi!</h2>
+                <a href="index.php?url=shop" class="text-blue-600 font-bold underline mt-4 inline-block">Quay lại cửa hàng</a>
+            </div>
+        <?php endif; ?>
+    </div>
+</main>
 
-</div>
+<div id="size-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl scale-95 transition-transform duration-300" id="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-black uppercase italic tracking-tighter">Chọn Size Giày</h3>
+            <button onclick="closeQuickSelect()" class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        </div>
 
-<div class="flex items-center gap-6">
+        <div class="flex gap-4 mb-8 items-center bg-gray-50 p-4 rounded-3xl">
+            <img id="modal-img" src="" class="w-16 h-16 object-cover rounded-xl shadow-sm">
+            <div>
+                <p id="modal-name" class="font-bold text-xs line-clamp-1 uppercase text-gray-500"></p>
+                <p id="modal-price" class="text-blue-600 font-black italic"></p>
+            </div>
+        </div>
 
-<form class="relative" method="GET" action="index.php">
-    <input type="hidden" name="url" value="search">
+<form action="index.php?url=addToCart" method="POST">
+    <input type="hidden" name="product_id" id="modal-id">
+    <input type="hidden" name="quantity" value="1">
+    
+    <div class="mb-8 text-center">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 italic">Chọn kích cỡ:</p>
+        <div class="flex flex-wrap justify-center gap-2">
+            <?php 
+            $sizes = ['38', '39', '40', '41', '42', '43']; 
+            foreach($sizes as $s): 
+            ?>
+                <label class="cursor-pointer group">
+                    <input type="radio" name="size_name" value="<?= $s ?>" class="hidden peer" required>
+                    <span class="inline-block w-12 py-2 border-2 border-gray-100 rounded-xl font-bold text-sm peer-checked:border-black peer-checked:bg-black peer-checked:text-white transition-all group-hover:border-gray-300">
+                        <?= $s ?>
+                    </span>
+                </label>
+            <?php endforeach; ?>
+        </div>
+    </div>
 
-    <input
-        type="text"
-        name="keyword"
-        placeholder="Tìm kiếm sản phẩm..."
-        class="w-48 md:w-64 lg:w-72 p-2.5 pl-10 pr-10 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200"
-    />
-
-    <!-- Nút submit -->
-    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-        <i class="fa-solid fa-magnifying-glass"></i>
+    <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg uppercase tracking-widest active:scale-95">
+        Xác nhận mua ngay
     </button>
 </form>
-
-    <div class="flex gap-4 text-xl">
-    <a href="index.php?url=cart">
-    <i class="fa-solid fa-cart-shopping cursor-pointer"></i>
-</a>
-<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
-
-<?php if (isset($_SESSION['user'])): ?>
-
-    <!-- Đã login -->
-    <div class="flex items-center gap-2 text-sm">
-        <span class="font-semibold text-gray-700">
-            <?= $_SESSION['user']['name'] ?>
-        </span>
-
-        <a href="index.php?url=logout"
-           class="text-red-500 hover:underline">
-           Đăng xuất
-        </a>
     </div>
-
-<?php else: ?>
-
-    <!-- Chưa login -->
-    <a href="index.php?url=login">
-        <i class="fa-solid fa-user cursor-pointer"></i>
-    </a>
-
-<?php endif; ?>
 </div>
 
-</div>
-
-</div>
-
-</header>
-    <main class="lg:max-w-7xl mx-auto">
-  <div class="lg:text-[15px] text-gray-500 lg:mt-5">
-    Home > <span class="text-black">Casual</span>
-  </div>
-
-  <div class="flex gap-10">
-    
-    <!-- FILTER -->
-<section class="border border-gray-500 w-[25%] rounded-3xl mt-10">
-  <form method="GET" action="index.php" class="w-[250px] mx-auto">
-
-    <input type="hidden" name="url" value="shop">
-
-    <!-- HEADER -->
-    <div class="flex items-center justify-between border-b border-gray-500 pt-5 pb-5">
-      <p class="font-bold">Filters</p>
-      <i class="fa-solid fa-sliders"></i>
-    </div>
-
-    <!-- BRAND -->
-    <div class="pt-5 pb-5 border-b border-gray-500">
-      <p class="font-bold mb-3">Brand</p>
-
-      <div class="flex flex-col gap-2">
-        <?php foreach($listBrand as $b): ?>
-          <label class="flex items-center gap-2 cursor-pointer group">
-            <input 
-              type="checkbox" 
-              name="brand[]" 
-              value="<?= $b['brand_id'] ?>"
-              class="hidden peer"
-            >
-
-            <!-- custom checkbox -->
-            <div class="w-4 h-4 border border-gray-400 rounded 
-                        peer-checked:bg-black peer-checked:border-black 
-                        transition"></div>
-
-            <span class="text-gray-600 group-hover:text-black 
-                         peer-checked:text-black transition">
-              <?= $b['brand_name'] ?>
-            </span>
-          </label>
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <!-- SIZE -->
-    <div>
-      <div class="flex justify-between pt-5 pb-5">
-        <p class="font-bold">Size</p>
-      </div>
-
-      <!-- GRID đều nhau -->
-      <div class="grid grid-cols-4 gap-3 border-b border-gray-500 pb-5">
-        <?php foreach($listSize as $s): ?>
-          <label class="cursor-pointer">
-            <input 
-              type="checkbox" 
-              name="size[]" 
-              value="<?= $s['size_id'] ?>" 
-              class="hidden peer"
-            >
-
-            <div class="text-center py-2 rounded-2xl border 
-                        text-gray-500 
-                        hover:border-black hover:text-black
-                        peer-checked:bg-black peer-checked:text-white peer-checked:border-black
-                        transition">
-              <?= $s['size_value'] ?>
+<footer class="bg-gray-100 pt-24 pb-12 border-t mt-20">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12 pb-16">
+            <div class="md:col-span-2">
+                <a href="index.php" class="flex items-baseline italic tracking-tighter">
+                    <span class="text-4xl font-black text-slate-900">N2</span>
+                    <span class="ml-1 text-2xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
+                </a>
+                <p class="text-gray-500 mt-6 leading-relaxed max-w-sm italic">Dẫn đầu phong cách thể thao với những mẫu giày hot nhất thị trường.</p>
+                <div class="flex gap-4 mt-8">
+                    <a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-white border hover:bg-black hover:text-white transition shadow-sm text-xl"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-white border hover:bg-black hover:text-white transition shadow-sm text-xl"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-12 h-12 flex items-center justify-center rounded-full bg-white border hover:bg-black hover:text-white transition shadow-sm text-xl"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
             </div>
-          </label>
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <!-- BUTTON -->
-    <div class="pb-5 pt-5">
-      <button type="submit" class="w-full p-3 text-white text-[18px] bg-black rounded-3xl hover:opacity-80 transition">
-        Apply filters
-      </button>
-    </div>
-
-  </form>
-</section>
-
-<!-- PRODUCTS -->
-<section class="mt-10 w-[75%]">
-
-  <div class="flex justify-between pl-5">
-    <h2 class="font-bold text-2xl">All products</h2>
-    <p class="text-gray-500">
-      Showing <?= count($products ?? []) ?> Products
-    </p>
-  </div>
-
-  <!-- GRID -->
-  <div class="grid grid-cols-3 gap-5 pt-5 pl-5">
-
-    <?php if (!empty($products)): ?>
-      <?php foreach ($products as $p): ?>
-
-        <a href="index.php?url=productDetail&id=<?= $p['product_id'] ?>" 
-           class="flex flex-col bg-white p-3 rounded-xl shadow hover:scale-105 transition-transform duration-300 relative">
-
-          <img 
-            src="/baseDA1/uploads/<?= $p['image'] ?>" 
-            class="rounded-lg mb-3 w-full h-[250px] object-cover transition-transform duration-300 hover:scale-105">
-
-          <h3 class="font-semibold">
-            <?= $p['product_name'] ?>
-          </h3>
-
-          <p class="text-red-500 font-bold">
-            <?= number_format($p['base_price']) ?> vnđ
-          </p>
-
-        </a>
-
-      <?php endforeach; ?>
-    <?php else: ?>
-      <p class="text-gray-500 pl-5">Không có sản phẩm</p>
-    <?php endif; ?>
-
-  </div>
-
-</section>
-
-
-  </div>
-  
-</main>
-<footer class="relative mt-20"> <div class="bg-gray-100 py-12"> <div class="max-w-7xl mx-auto px-4"> <div class="grid grid-cols-1 md:grid-cols-5 gap-8 pb-10"> <div class="md:col-span-1">
-          <a href="index.php" class="flex items-baseline italic tracking-tighter hover:opacity-80 transition-opacity">
-            <span class="text-3xl font-black text-slate-900">N2</span>
-            <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
-          </a>
-          <p class="text-gray-600 mt-4 text-sm leading-relaxed">
-            Chúng tôi cung cấp những đôi giày phù hợp với phong cách của bạn và khiến bạn tự tin khi mang.
-          </p>
-          <div class="flex items-center gap-4 mt-6 text-xl text-gray-700">
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-github"></i></a>
-          </div>
+            <div><h3 class="font-black uppercase text-xs tracking-[3px] mb-8 text-slate-900">Khám phá</h3><ul class="space-y-4 text-sm text-gray-500 font-bold uppercase tracking-wider"><li><a href="index.php?url=shop" class="hover:text-black transition">Tất cả giày</a></li></ul></div>
+            <div><h3 class="font-black uppercase text-xs tracking-[3px] mb-8 text-slate-900">Hỗ trợ</h3><ul class="space-y-4 text-sm text-gray-500 font-bold uppercase tracking-wider"><li><a href="#" class="hover:text-black transition">Giao hàng</a></li></ul></div>
+            <div><h3 class="font-black uppercase text-xs tracking-[3px] mb-8 text-slate-900">FAQ</h3><ul class="space-y-4 text-sm text-gray-500 font-bold uppercase tracking-wider"><li><a href="#" class="hover:text-black transition">Bảo mật</a></li></ul></div>
         </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 md:col-span-4 gap-8">
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Công ty</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Giới thiệu</a></li>
-              <li><a href="#" class="hover:text-black">Tính năng</a></li>
-              <li><a href="#" class="hover:text-black">Dự án</a></li>
-              <li><a href="#" class="hover:text-black">Tuyển dụng</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Hỗ trợ</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Trung tâm trợ giúp</a></li>
-              <li><a href="#" class="hover:text-black">Chính sách</a></li>
-              <li><a href="#" class="hover:text-black">Hướng dẫn</a></li>
-              <li><a href="#" class="hover:text-black">Liên hệ</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">FAQ</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Về chúng tôi</a></li>
-              <li><a href="#" class="hover:text-black">Mua hàng</a></li>
-              <li><a href="#" class="hover:text-black">Thanh toán</a></li>
-              <li><a href="#" class="hover:text-black">Vận chuyển</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Tài nguyên</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Blog</a></li>
-              <li><a href="#" class="hover:text-black">Tin tức</a></li>
-              <li><a href="#" class="hover:text-black">Cộng đồng</a></li>
-            </ul>
-          </div>
+        <div class="pt-10 border-t flex flex-col md:flex-row items-center justify-between gap-6">
+            <p class="text-xs text-gray-400 font-black uppercase tracking-widest italic">N2 Sport &copy; 2026. Made by hải with ❤️</p>
+            <div class="flex items-center gap-6 text-4xl text-gray-300"><i class="fa-brands fa-cc-visa"></i><i class="fa-brands fa-cc-apple-pay"></i></div>
         </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row items-center justify-between border-t border-gray-300 pt-8 mt-2">
-        <p class="text-sm text-gray-500 italic">Shop.co &copy; 2000-2025 Bản quyền thuộc về N2 Sport</p>
-        <div class="flex items-center gap-4 mt-4 md:mt-0 text-3xl text-gray-700">
-          <i class="fa-brands fa-cc-visa"></i>
-          <i class="fa-brands fa-cc-mastercard"></i>
-          <i class="fa-brands fa-cc-paypal"></i>
-          <i class="fa-brands fa-cc-apple-pay"></i>
-        </div>
-      </div>
-
     </div>
-  </div>
 </footer>
+
+<script>
+    function openQuickSelect(id, name, price, img) {
+        const modal = document.getElementById('size-modal');
+        const content = document.getElementById('modal-content');
+        
+        // Gán dữ liệu vào Modal
+        document.getElementById('modal-id').value = id;
+        document.getElementById('modal-name').innerText = name;
+        document.getElementById('modal-price').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+        document.getElementById('modal-img').src = 'uploads/' + img;
+
+        // Hiện Modal
+        modal.classList.remove('hidden');
+        modal.classList.add('modal-active');
+        setTimeout(() => content.classList.replace('scale-95', 'scale-100'), 10);
+    }
+
+    function closeQuickSelect() {
+        const modal = document.getElementById('size-modal');
+        const content = document.getElementById('modal-content');
+        content.classList.replace('scale-100', 'scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('modal-active');
+        }, 200);
+    }
+
+    // Đóng khi click ngoài vùng modal
+    window.onclick = function(e) {
+        const modal = document.getElementById('size-modal');
+        if (e.target == modal) closeQuickSelect();
+    }
+</script>
+
 </body>
 </html>
