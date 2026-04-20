@@ -8,19 +8,14 @@ class ProductModel extends BaseModel
         parent::__construct();
     }
 
-    // ===== LẤY TẤT CẢ SẢN PHẨM (JOIN FULL) =====
+    // ===== LẤY TẤT CẢ SẢN PHẨM (Admin & Shop tổng) =====
     public function getAll()
     {
-        $sql = "SELECT p.*, 
-                       c.category_name, 
-                       b.brand_name,
-                       co.color_name,
-                       s.size_value
+        $sql = "SELECT p.*, c.category_name, b.brand_name
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.category_id
                 LEFT JOIN brands b ON p.brand_id = b.brand_id
-                LEFT JOIN colors co ON p.color_id = co.color_id
-                LEFT JOIN sizes s ON p.size_id = s.size_id
+                WHERE p.is_deleted = 0
                 ORDER BY p.product_id DESC";
 
         $stmt = $this->pdo->prepare($sql);
@@ -28,58 +23,87 @@ class ProductModel extends BaseModel
         return $stmt->fetchAll();
     }
 
-    // ===== THÊM SẢN PHẨM =====
-    public function insertProduct($name, $desc, $image, $price, $cate_id, $brand_id, $color_id, $size_id, $quantity)
+    // ===== LẤY SẢN PHẨM THEO DANH MỤC =====
+    public function getByCategory($cate_id)
     {
-        $sql = "INSERT INTO products(
-                    product_name, 
-                    description, 
-                    image, 
-                    base_price, 
-                    category_id, 
-                    brand_id,
-                    color_id,
-                    size_id,
-                    quantity
-                )
-                VALUES(
-                    :name, 
-                    :desc, 
-                    :image, 
-                    :price, 
-                    :cate_id, 
-                    :brand_id,
-                    :color_id,
-                    :size_id,
-                    :quantity
-                )";
+        $sql = "SELECT p.*, c.category_name, b.brand_name
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.category_id
+                LEFT JOIN brands b ON p.brand_id = b.brand_id
+                WHERE p.category_id = :cate_id AND p.is_deleted = 0
+                ORDER BY p.product_id DESC";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':desc', $desc);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':price', $price);
-        $stmt->bindParam(':cate_id', $cate_id);
-        $stmt->bindParam(':brand_id', $brand_id);
-        $stmt->bindParam(':color_id', $color_id);
-        $stmt->bindParam(':size_id', $size_id);
-        $stmt->bindParam(':quantity', $quantity);
+        $stmt->execute(['cate_id' => $cate_id]);
+        return $stmt->fetchAll();
+    }
 
-        return $stmt->execute();
+    // ===== THÊM SẢN PHẨM =====
+    public function insertProduct($name, $desc, $image, $price, $cate_id, $brand_id)
+    {
+        $sql = "INSERT INTO products(product_name, description, image, base_price, category_id, brand_id, is_deleted)
+                VALUES(:name, :desc, :image, :price, :cate_id, :brand_id, 0)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'name' => $name,
+            'desc' => $desc,
+            'image' => $image,
+            'price' => $price,
+            'cate_id' => $cate_id,
+            'brand_id' => $brand_id
+        ]);
+
+        return $this->pdo->lastInsertId();
+    }
+
+    // ===== THÊM BIẾN THỂ (KÈM SỐ LƯỢNG) =====
+    public function insertVariant($product_id, $size_id, $color_id, $quantity)
+    {
+        $sql = "INSERT INTO product_variants (product_id, size_id, color_id, quantity)
+                VALUES (:product_id, :size_id, :color_id, :quantity)";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            'product_id' => $product_id,
+            'size_id'    => $size_id,
+            'color_id'   => $color_id,
+            'quantity'   => $quantity
+        ]);
+    }
+
+    // ===== XOÁ BIẾN THỂ THEO SẢN PHẨM =====
+    public function deleteVariantByProduct($product_id)
+    {
+        $sql = "DELETE FROM product_variants WHERE product_id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute(['id' => $product_id]);
+    }
+
+    // ===== LẤY BIẾN THỂ (LẤY CẢ QUANTITY ĐỂ HIỂN THỊ KHO) =====
+    public function getVariantByProduct($product_id) {
+        $sql = "SELECT pv.*, c.color_name, c.color_code, s.size_value 
+                FROM product_variants pv
+                JOIN colors c ON pv.color_id = c.color_id
+                JOIN sizes s ON pv.size_id = s.size_id
+                WHERE pv.product_id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $product_id]);
+        return $stmt->fetchAll();
     }
 
     // ===== TÌM 1 SẢN PHẨM =====
     public function find($id)
     {
-        $sql = "SELECT * FROM products WHERE product_id = :id";
+        $sql = "SELECT * FROM products WHERE product_id = :id AND is_deleted = 0";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
+        $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
 
-    // ===== CẬP NHẬT =====
-    public function updateProduct($id, $name, $desc, $image, $price, $cate_id, $brand_id, $color_id, $size_id, $quantity)
+    // ===== CẬP NHẬT SẢN PHẨM =====
+    public function updateProduct($id, $name, $desc, $image, $price, $cate_id, $brand_id)
     {
         $sql = "UPDATE products 
                 SET product_name = :name,
@@ -87,156 +111,81 @@ class ProductModel extends BaseModel
                     image = :image,
                     base_price = :price,
                     category_id = :cate_id,
-                    brand_id = :brand_id,
-                    color_id = :color_id,
-                    size_id = :size_id,
-                    quantity = :quantity
+                    brand_id = :brand_id
                 WHERE product_id = :id";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':desc', $desc);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':price', $price);
-        $stmt->bindParam(':cate_id', $cate_id);
-        $stmt->bindParam(':brand_id', $brand_id);
-        $stmt->bindParam(':color_id', $color_id);
-        $stmt->bindParam(':size_id', $size_id);
-        $stmt->bindParam(':quantity', $quantity);
-        $stmt->bindParam(':id', $id);
-
-        return $stmt->execute();
+        return $stmt->execute([
+            'name' => $name,
+            'desc' => $desc,
+            'image' => $image,
+            'price' => $price,
+            'cate_id' => $cate_id,
+            'brand_id' => $brand_id,
+            'id' => $id
+        ]);
     }
+
+    // ===== XOÁ MỀM =====
+    public function deleteProduct($id) {
+        $sql = "UPDATE products SET is_deleted = 1 WHERE product_id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    // ===== LOGIC TRỪ KHO KHI MUA HÀNG (QUAN TRỌNG) =====
+    public function minusStock($product_id, $size_id, $quantity) {
+        $sql = "UPDATE product_variants 
+                SET quantity = quantity - :qty 
+                WHERE product_id = :p_id AND size_id = :s_id AND quantity >= :qty";
+        
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            'qty'  => $quantity,
+            'p_id' => $product_id,
+            's_id' => $size_id
+        ]);
+    }
+
+    // ===== LOGIC CỘNG LẠI KHO KHI HUỶ ĐƠN =====
+    public function plusStock($product_id, $size_id, $quantity) {
+        $sql = "UPDATE product_variants 
+                SET quantity = quantity + :qty 
+                WHERE product_id = :p_id AND size_id = :s_id";
+        
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            'qty'  => $quantity,
+            'p_id' => $product_id,
+            's_id' => $size_id
+        ]);
+    }
+
+    // ===== LẤY SẢN PHẨM GIỚI HẠN (Trang chủ) =====
     public function getAllLimit($limit = 8)
     {
-        $sql = "SELECT p.*, c.category_name, b.brand_name
-            FROM products p
-            LEFT JOIN categories c ON p.category_id = c.category_id
-            LEFT JOIN brands b ON p.brand_id = b.brand_id
-            ORDER BY p.product_id DESC
-            LIMIT $limit";
-
+        $sql = "SELECT * FROM products WHERE is_deleted = 0 ORDER BY product_id DESC LIMIT :limit";
         $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
+    // ===== LẤY SẢN PHẨM HOT/MỚI (Dùng cho trang chủ HomeController) =====
     public function getHotProducts($limit = 8)
     {
-        $sql = "SELECT * FROM products ORDER BY quantity DESC LIMIT $limit";
+        // Tớ dùng luôn logic lấy sản phẩm mới nhất làm sản phẩm HOT
+        $sql = "SELECT p.*, c.category_name 
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.category_id
+                WHERE p.is_deleted = 0 
+                ORDER BY p.product_id DESC 
+                LIMIT :limit";
+
         $stmt = $this->pdo->prepare($sql);
+        // Ép kiểu (int) cho limit để PDO không bắt lỗi bindValue
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $stmt->fetchAll();
     }
-    // ===== SẢN PHẨM LIÊN QUAN =====
-    public function getRelated($category_id, $current_id, $limit = 6)
-    {
-        $sql = "SELECT p.*, 
-                   c.category_name, 
-                   b.brand_name
-            FROM products p
-            LEFT JOIN categories c ON p.category_id = c.category_id
-            LEFT JOIN brands b ON p.brand_id = b.brand_id
-            WHERE p.category_id = :cate_id
-            AND p.product_id != :current_id
-            ORDER BY p.product_id DESC
-            LIMIT $limit";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':cate_id', $category_id);
-        $stmt->bindParam(':current_id', $current_id);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function getProductByCategory($category_id)
-    {
-        $sql = "SELECT * FROM products WHERE category_id = ?";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$category_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function getProductById($id)
-    {
-        $sql = "SELECT * FROM products WHERE product_id = ?";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // ===== XOÁ =====
-    public function deleteProduct($id)
-    {
-        $sql = "DELETE FROM products WHERE product_id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
-    }
-public function search($keyword)
-{
-    $keyword = trim($keyword);
-
-    if ($keyword === '') {
-        return []; // 🔥 tránh search rỗng
-    }
-
-    $sql = "
-        SELECT p.*, 
-               c.category_name, 
-               b.brand_name
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.category_id
-        LEFT JOIN brands b ON p.brand_id = b.brand_id
-        WHERE 
-            p.product_name LIKE :keyword
-            OR c.category_name LIKE :keyword
-            OR b.brand_name LIKE :keyword
-    ";
-
-    $stmt = $this->pdo->prepare($sql);
-
-    $stmt->execute([
-        ':keyword' => '%' . $keyword . '%'
-    ]);
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-public function filterAll($category_id = null, $brands = [], $sizes = [])
-{
-    $sql = "
-        SELECT p.*, 
-               c.category_name, 
-               b.brand_name,
-               s.size_value
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.category_id
-        LEFT JOIN brands b ON p.brand_id = b.brand_id
-        LEFT JOIN sizes s ON p.size_id = s.size_id
-        WHERE 1=1
-    ";
-
-    $params = [];
-
-    // lọc category
-    if ($category_id) {
-        $sql .= " AND p.category_id = :category_id";
-        $params[':category_id'] = $category_id;
-    }
-
-    // lọc brand
-    if (!empty($brands)) {
-        $sql .= " AND p.brand_id IN (" . implode(',', array_map('intval', $brands)) . ")";
-    }
-
-    // lọc size
-    if (!empty($sizes)) {
-        $sql .= " AND p.size_id IN (" . implode(',', array_map('intval', $sizes)) . ")";
-    }
-
-    $sql .= " ORDER BY p.product_id DESC";
-
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute($params);
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 }
