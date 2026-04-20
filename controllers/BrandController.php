@@ -15,14 +15,14 @@ class BrandController
     {
         $listBrand = $this->brandModel->getAll();
 
-        $view = 'admin/brand/listBrand.php';
+        $view = PATH_VIEW . 'admin/brand/listBrand.php';
         require_once PATH_VIEW . 'admin/main.php';
     }
 
     // ===== FORM THÊM =====
     public function add()
     {
-        $view = 'admin/brand/addBrand.php';
+        $view = PATH_VIEW . 'admin/brand/addBrand.php';
         require_once PATH_VIEW . 'admin/main.php';
     }
 
@@ -63,12 +63,9 @@ class BrandController
             return;
         }
 
-        $view = 'admin/brand/editBrand.php';
+        $view = PATH_VIEW . 'admin/brand/editBrand.php';
         require_once PATH_VIEW . 'admin/main.php';
     }
-    public function clientList() {
-    include 'views/client/brands.php';
-}
 
     // ===== XỬ LÝ SỬA =====
     public function editProcess()
