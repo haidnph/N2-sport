@@ -1,283 +1,166 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+// Quan trọng: Phải lấy từ $_SESSION['cart'] để đảm bảo dữ liệu mới nhất
+$cart = $_SESSION['cart'] ?? [];
+$total = 0;
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giỏ hàng N2SPORT — Sải bước tự tin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-<!-- Font Awesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-white">
- <header class="shadow-sm">
 
-<!-- TOP BAR -->
+<body class="bg-slate-50 min-h-screen">
 
+  <nav class="bg-white border-b border-slate-100 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-6">
+      <a href="index.php" class="flex items-baseline italic tracking-tighter">
+        <span class="text-3xl font-black text-slate-900">N2</span>
+        <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-400">Sport</span>
+      </a>
+      <a href="index.php?url=shop" class="text-[10px] font-black uppercase tracking-[2px] text-slate-400 hover:text-black transition-all flex items-center gap-2 italic">
+        <i class="fa-solid fa-arrow-left-long"></i> Tiếp tục mua sắm
+      </a>
+    </div>
+  </nav>
 
-
-<div class="max-w-7xl mx-auto flex justify-between items-center p-5">
-
-<div class="flex items-center gap-10">
-
-    <div class="flex items-center flex-shrink-0 gap-2 group">
-        <a href="index.php" class="flex items-baseline italic tracking-tighter transition-opacity duration-300 hover:opacity-80">
-            <span class="text-3xl font-black text-slate-900">N<span class="text-black">2</span></span>
-            <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
-        </a>
+  <main class="max-w-7xl mx-auto py-12 px-6">
+    <div class="mb-12">
+      <h2 class="font-black text-5xl text-slate-900 uppercase italic tracking-tighter leading-none">
+        Giỏ hàng <span class="text-blue-600">của bạn</span>
+      </h2>
+      <p class="text-slate-400 font-bold uppercase text-[10px] tracking-[3px] mt-2 italic">
+        Bạn đang có <?= count($cart) ?> siêu phẩm trong danh sách
+      </p>
     </div>
 
-    <!-- MENU -->
-   <ul class="flex gap-6 flex-nowrap overflow-x-auto scrollbar-hide whitespace-nowrap">
-    <li class="relative group">
-        <a href="index.php?url=shop" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Shop
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayCauLong" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày cầu lông
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayBongDa" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng đá
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giay-bong-ro" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng rổ
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayChay" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày chạy bộ
-        </a>
-    </li>
-    <li class="relative group">
-        <a href="index.php?url=giayBongChuyen" class="block px-3 py-2 rounded-md transition-all duration-300 group-hover:bg-gray-100 group-hover:text-black transform group-hover:-translate-y-1">
-            Giày bóng chuyền
-        </a>
-    </li>
-</ul>
-
-</div>
-
-<div class="flex items-center gap-6">
-
-     <form class="relative">
-    <input
-        type="text"
-        placeholder="Tìm kiếm sản phẩm..."
-        class="w-48 md:w-64 lg:w-72 p-2.5 pl-10 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200"
-    />
-    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-</form>
-
-    <div class="flex gap-4 text-xl">
-    <a href="index.php?url=cart">
-    <i class="fa-solid fa-cart-shopping cursor-pointer"></i>
-</a>
-<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
-
-<?php if (isset($_SESSION['user'])): ?>
-
-    <!-- Đã login -->
-    <div class="flex items-center gap-2 text-sm">
-        <span class="font-semibold text-gray-700">
-            <?= $_SESSION['user']['name'] ?>
-        </span>
-
-        <a href="index.php?url=logout"
-           class="text-red-500 hover:underline">
-           Đăng xuất
-        </a>
-    </div>
-
-<?php else: ?>
-
-    <!-- Chưa login -->
-    <a href="index.php?url=login">
-        <i class="fa-solid fa-user cursor-pointer"></i>
-    </a>
-
-<?php endif; ?>
-</div>
-
-</div>
-
-</div>
-
-</header>
-    <main class="max-w-7xl mx-auto">
-  <div class="lg:text-[15px] text-gray-500 lg:mt-5">
-    Home > <span class="lg:text-black">Cart</span>
-  </div>
-
-  <section>
-    <h2 class="Integral font-extrabold text-3xl p-5">
-      YOUR CART (3 items)
-    </h2>
-
-    <div class="flex justify-between gap-5">
-      
-      <!-- CART LIST -->
-      <div class="w-[65%] mx-auto border border-gray-500 rounded-2xl pt-2 pb-2 pl-10">
-
-        <!-- ITEM -->
-        <div class="flex items-center gap-5 border-b py-5">
-          <img src="https://via.placeholder.com/100" class="rounded-xl">
-          <div class="flex-1">
-            <h3 class="font-bold">T-Shirt</h3>
-            <p class="text-gray-500">Size: L | Color: Black</p>
-            <p class="font-bold">$120</p>
+    <div class="flex flex-col lg:flex-row gap-10">
+      <div class="w-full lg:w-[65%] space-y-6">
+        <?php if (empty($cart)): ?>
+          <div class="bg-white rounded-[40px] p-20 text-center border border-slate-100 shadow-sm">
+            <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fa-solid fa-cart-shopping text-slate-200 text-4xl"></i>
+            </div>
+            <p class="text-slate-400 font-bold italic uppercase tracking-widest text-sm">Giỏ hàng đang trống trơn</p>
+            <a href="index.php?url=shop" class="inline-block mt-8 bg-black text-white px-10 py-4 rounded-full font-black uppercase italic tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-blue-200/50">Mua sắm ngay</a>
           </div>
-          <input type="number" value="1" class="w-16 border rounded p-1">
-        </div>
+        <?php else: ?>
+          <?php foreach ($cart as $cartKey => $item):
+            $price = (float)($item['price'] ?? 0);
+            $qty = (int)($item['quantity'] ?? 0);
+            $subtotal = $price * $qty;
+            $total += $subtotal;
+          ?>
+            <div class="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center gap-8 relative group hover:shadow-xl transition-all">
 
-        <!-- ITEM -->
-        <div class="flex items-center gap-5 border-b py-5">
-          <img src="https://via.placeholder.com/100" class="rounded-xl">
-          <div class="flex-1">
-            <h3 class="font-bold">Hoodie</h3>
-            <p class="text-gray-500">Size: M | Color: Gray</p>
-            <p class="font-bold">$200</p>
-          </div>
-          <input type="number" value="1" class="w-16 border rounded p-1">
-        </div>
+              <div class="w-32 h-32 flex-shrink-0 relative">
+                <img src="uploads/<?= htmlspecialchars((string)($item['image'] ?? '')) ?>"
+                  class="rounded-2xl w-full h-full object-cover shadow-inner bg-slate-50 border border-slate-50"
+                  onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+              </div>
 
-        <!-- ITEM -->
-        <div class="flex items-center gap-5 py-5">
-          <img src="https://via.placeholder.com/100" class="rounded-xl">
-          <div class="flex-1">
-            <h3 class="font-bold">Jeans</h3>
-            <p class="text-gray-500">Size: XL | Color: Blue</p>
-            <p class="font-bold">$150</p>
-          </div>
-          <input type="number" value="1" class="w-16 border rounded p-1">
-        </div>
+              <div class="flex-1 text-center sm:text-left">
+                <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest italic px-2 py-1 bg-blue-50 rounded-md">Original Gear</span>
+                <h3 class="font-black text-xl text-slate-900 uppercase italic tracking-tight mt-2 leading-none">
+                  <?= htmlspecialchars((string)($item['name'] ?? 'Sản phẩm')) ?>
+                </h3>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2 italic">
+                  Size: <span class="text-slate-900"><?= htmlspecialchars((string)($item['size'] ?? $item['size_name'] ?? 'N/A')) ?></span>
+                </p>
+                <p class="font-black text-blue-600 text-lg mt-3 italic">
+                  <?= number_format($price) ?> <span class="text-xs">₫</span>
+                </p>
+              </div>
 
+              <div class="flex items-center bg-slate-100 rounded-2xl p-1 border border-slate-200 shadow-inner">
+                <a href="index.php?url=decrease&id=<?= urlencode($cartKey) ?>"
+                  class="w-10 h-10 flex items-center justify-center font-black text-lg hover:bg-white rounded-xl transition-all">-</a>
+
+                <span class="px-6 font-black text-slate-900 italic"><?= $qty ?></span>
+
+                <a href="index.php?url=increase&id=<?= urlencode($cartKey) ?>"
+                  class="w-10 h-10 flex items-center justify-center font-black text-lg hover:bg-white rounded-xl transition-all">+</a>
+              </div>
+
+              <div class="sm:border-l border-slate-100 sm:pl-8 flex flex-col items-center">
+                <p class="hidden sm:block text-[9px] font-black text-slate-300 uppercase italic mb-2 tracking-widest">Xóa ngay</p>
+                <a href="index.php?url=remove&id=<?= urlencode($cartKey) ?>"
+                  onclick="return confirm('Xóa siêu phẩm này khỏi giỏ hàng?')"
+                  class="w-12 h-12 flex items-center justify-center text-rose-400 hover:text-white hover:bg-rose-500 rounded-2xl transition-all">
+                  <i class="fa-solid fa-trash-can"></i>
+                </a>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </div>
 
-      <!-- SUMMARY -->
-      <div class="w-[35%] h-[440px] border border-gray-500 rounded-3xl p-5">
-        <h2 class="font-bold text-2xl">Order Summary</h2>
+      <?php
+      $discountRate = 0.2;
+      $discount = $total * $discountRate;
+      $delivery = ($total > 0) ? 10000 : 0;
+      $final = $total - $discount + $delivery;
+      ?>
 
-        <div class="flex flex-col gap-7">
-          <div class="border-b border-gray-500 flex flex-col gap-5 mt-5 pb-5">
-            
-            <div class="flex justify-between">
-              <span class="text-gray-500">SubTotal</span>
-              <p class="font-bold">$470</p>
+      <div class="w-full lg:w-[35%]">
+        <div class="bg-slate-900 rounded-[40px] p-10 text-white shadow-2xl relative overflow-hidden group">
+          <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+
+          <h2 class="font-black text-2xl uppercase italic tracking-tighter mb-10 border-b border-white/10 pb-6">Thanh toán</h2>
+
+          <div class="space-y-6 relative z-10">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] italic">Tạm tính</span>
+              <p class="font-black italic text-lg"><?= number_format($total) ?> ₫</p>
             </div>
 
-            <div class="flex justify-between">
-              <span class="text-gray-500">Discount (-20%)</span>
-              <p class="font-bold">$94</p>
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] italic">Ưu đãi Member (20%)</span>
+              <p class="font-black italic text-lg text-blue-400">-<?= number_format($discount) ?> ₫</p>
             </div>
 
-            <div class="flex justify-between">
-              <span class="text-gray-500">Delivery Fee</span>
-              <p class="font-bold">$10</p>
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] italic">Phí vận chuyển</span>
+              <p class="font-black italic text-lg"><?= number_format($delivery) ?> ₫</p>
             </div>
 
+            <div class="pt-8 border-t border-white/10 flex justify-between items-end">
+              <span class="text-[10px] font-black uppercase tracking-[3px] text-blue-400 italic">Tổng cộng</span>
+              <p class="font-black text-4xl italic leading-none tracking-tighter">
+                <?= number_format($final) ?> <span class="text-xs">₫</span>
+              </p>
+            </div>
           </div>
 
-          <div class="flex justify-between">
-            <span>Total</span>
-            <p class="font-bold">$386</p>
-          </div>
+          <?php if (!empty($cart)): ?>
+            <a href="index.php?url=checkout"
+              class="block text-center w-full mt-12 bg-blue-600 hover:bg-white hover:text-black text-white font-black py-6 rounded-[24px] transition-all shadow-xl active:scale-[0.98] text-sm uppercase tracking-[3px] italic">
+              Tiến hành đặt hàng <i class="fa-solid fa-arrow-right-long ml-2"></i>
+            </a>
+          <?php else: ?>
+            <button disabled class="block w-full mt-12 bg-white/5 text-white/20 font-black py-6 rounded-[24px] text-sm uppercase tracking-[3px] italic cursor-not-allowed border border-white/5">
+              Giỏ hàng trống
+            </button>
+          <?php endif; ?>
         </div>
-
-        <div class="flex justify-between mt-7 mb-7">
-          <input
-            type="text"
-            placeholder="Apply promo code"
-            class="bg-gray-200 p-2 rounded-3xl placeholder:text-gray-500 w-[70%]"
-          />
-          <button class="bg-black text-white p-2 w-[25%] rounded-3xl">
-            Apply
-          </button>
-        </div>
-
-        <button class="w-full bg-black text-white p-4 rounded-3xl">
-          Go to checkout <i class="fa-solid fa-arrow-right-long"></i>
-        </button>
+        <p class="text-center mt-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">N2SPORT Security Payment System</p>
       </div>
-
     </div>
-  </section>
-</main>
-<footer class="relative mt-20"> <div class="bg-gray-100 py-12"> <div class="max-w-7xl mx-auto px-4"> <div class="grid grid-cols-1 md:grid-cols-5 gap-8 pb-10"> <div class="md:col-span-1">
-          <a href="index.php" class="flex items-baseline italic tracking-tighter hover:opacity-80 transition-opacity">
-            <span class="text-3xl font-black text-slate-900">N2</span>
-            <span class="ml-1 text-xl font-bold uppercase tracking-widest text-slate-500">Sport</span>
-          </a>
-          <p class="text-gray-600 mt-4 text-sm leading-relaxed">
-            Chúng tôi cung cấp những đôi giày phù hợp với phong cách của bạn và khiến bạn tự tin khi mang.
-          </p>
-          <div class="flex items-center gap-4 mt-6 text-xl text-gray-700">
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-github"></i></a>
-          </div>
-        </div>
+  </main>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 md:col-span-4 gap-8">
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Công ty</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Giới thiệu</a></li>
-              <li><a href="#" class="hover:text-black">Tính năng</a></li>
-              <li><a href="#" class="hover:text-black">Dự án</a></li>
-              <li><a href="#" class="hover:text-black">Tuyển dụng</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Hỗ trợ</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Trung tâm trợ giúp</a></li>
-              <li><a href="#" class="hover:text-black">Chính sách</a></li>
-              <li><a href="#" class="hover:text-black">Hướng dẫn</a></li>
-              <li><a href="#" class="hover:text-black">Liên hệ</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">FAQ</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Về chúng tôi</a></li>
-              <li><a href="#" class="hover:text-black">Mua hàng</a></li>
-              <li><a href="#" class="hover:text-black">Thanh toán</a></li>
-              <li><a href="#" class="hover:text-black">Vận chuyển</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-sm uppercase tracking-wider">Tài nguyên</h3>
-            <ul class="mt-4 space-y-2 text-sm text-gray-600">
-              <li><a href="#" class="hover:text-black">Blog</a></li>
-              <li><a href="#" class="hover:text-black">Tin tức</a></li>
-              <li><a href="#" class="hover:text-black">Cộng đồng</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row items-center justify-between border-t border-gray-300 pt-8 mt-2">
-        <p class="text-sm text-gray-500 italic">Shop.co &copy; 2000-2025 Bản quyền thuộc về N2 Sport</p>
-        <div class="flex items-center gap-4 mt-4 md:mt-0 text-3xl text-gray-700">
-          <i class="fa-brands fa-cc-visa"></i>
-          <i class="fa-brands fa-cc-mastercard"></i>
-          <i class="fa-brands fa-cc-paypal"></i>
-          <i class="fa-brands fa-cc-apple-pay"></i>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</footer>
 </body>
+
 </html>
